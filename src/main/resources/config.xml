@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--请求处理器配置文件-->
+<actions>
+    <!--获取服务器时间接口-->
+    <action name="test">
+        <handleClass>
+            com.wdl.web.service.TestService
+        </handleClass>
+        <handleMethod>
+            test
+        </handleMethod>
+    </action>
+
+</actions>

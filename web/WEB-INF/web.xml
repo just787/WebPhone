@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <!--<param-name>javax.faces.CONFIG_FILES</param-name>-->
+        <!--访问&处理接口配置文件 classpath*:/config.xml-->
+        <param-value>classpath*:/config.xml</param-value>
+    </context-param>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!--servlet处理类-->
+    <servlet>
+        <servlet-name>resAPIServlet</servlet-name>
+        <servlet-class>com.wdl.web.frame.ResourceApi</servlet-class>
+        <load-on-startup>3</load-on-startup>
+    </servlet>
+    <!--servlet请求匹配规则-->
+    <servlet-mapping>
+        <servlet-name>resAPIServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>
