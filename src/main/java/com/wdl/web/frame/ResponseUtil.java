@@ -1,6 +1,6 @@
 package com.wdl.web.frame;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +34,6 @@ public class ResponseUtil {
     public static void response(int code, HttpServletResponse response) {
         Responsex responsex = new Responsex();
         responsex.getResult(code);
-        response(new Gson().toJson(responsex), null, response);
+        response(JSON.toJSONString(responsex), null, response);
     }
 }

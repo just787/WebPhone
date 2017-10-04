@@ -1,6 +1,6 @@
 package com.wdl.web.frame;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,7 +47,7 @@ public class ResourceApi extends HttpServlet {
             HandlerElement handlerElement = Initor.initor.getHandlerElement(action);
             if (handlerElement != null) {
                 Responsex responsex = (Responsex) handlerElement.handle(request, response);
-                ResponseUtil.response(new Gson().toJson(responsex), request, response);
+                ResponseUtil.response(JSON.toJSONString(responsex), request, response);
             }
         } catch (ServerException s) {
             ResponseUtil.response(s.getCode(), response);

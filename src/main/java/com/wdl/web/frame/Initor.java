@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public class Initor {
     private static String path = "config.xml";
     // 初始化类的唯一对象
     public static Initor initor = new Initor();
-    // 访问路径和处理器映射map
+    // 访问路径对应的处理器映射map
     private Map<String, HandlerElement> handlerElementMap = new HashMap<String, HandlerElement>();
 
     /**
@@ -30,9 +31,12 @@ public class Initor {
         try {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(path);
             documentMap(document);
+            annotationMap();
+
+            System.out.println("初始化注入完成!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("配置文件初始化失败!");
+            System.out.println("初始化注入失败!");
         }
     }
 
@@ -46,13 +50,13 @@ public class Initor {
         for (int i = 0, len = nodeList.getLength(); i < len; i++) {
             Element element = (Element) nodeList.item(i);
             // 访问路径
-            String pathStr = element.getAttribute("name").replaceAll("\\s*|\t|\r|\n","");;
+            String pathStr = element.getAttribute("name").replaceAll("\\s*|\t|\r|\n", "");
             // 类全路径
             String classNameStr = element.getElementsByTagName("handleClass").item(0).getFirstChild().getNodeValue()
-                    .replaceAll("\\s*|\t|\r|\n","");
+                    .replaceAll("\\s*|\t|\r|\n", "");
             // 路径对应的方法名
             String methodStr = element.getElementsByTagName("handleMethod").item(0).getFirstChild().getNodeValue()
-                    .replaceAll("\\s*|\t|\r|\n","");;
+                    .replaceAll("\\s*|\t|\r|\n", "");
 
             if (handlerElementMap.containsKey(pathStr)) {
                 continue;
@@ -62,6 +66,31 @@ public class Initor {
             if (handlerElement != null) {
                 handlerElementMap.put(pathStr, handlerElement);
             }
+        }
+    }
+
+
+    private void annotationMap() {
+        // 通过扫描获取包下都所有类
+        List<Class<?>> clazzs = ScanPackageClass.getClasses("com.wdl.web.service");
+        try {
+            if (clazzs != null) {
+                for (Class<?> clazz : clazzs) {
+                    for (Method method : clazz.getDeclaredMethods()) {
+                        if (method.isAnnotationPresent(RequestMapping.class)) {
+                            String path = method.getAnnotation(RequestMapping.class).value().replaceAll("/", "");
+                            if (handlerElementMap.containsKey(path)) {
+                                continue;
+                            }
+                            method.setAccessible(true);
+                            handlerElementMap.put(path, new HandlerElement(clazz.newInstance(), method));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("通过注解注入失败");
         }
     }
 
@@ -86,7 +115,7 @@ public class Initor {
                 handlerElement = new HandlerElement(instance, method);
             }
         } catch (Exception e) {
-            System.out.println("反射获取类对象和方法失败!");
+            System.out.println("通过配置文件反射获取类对象和方法失败!");
             throw new ServerException(-1);
         }
 
